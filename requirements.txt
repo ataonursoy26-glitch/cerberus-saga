@@ -1,0 +1,34 @@
+# Cerberus Saga — Python dependencies (Blueprint Volume 6)
+# NOTE: the 'demo' command needs NO third-party packages (standard library only).
+# The packages below are for the SaaS/API, PDF reports, encryption and live integrations.
+
+# --- Web API / SaaS Gateway ---
+fastapi==0.110.0
+uvicorn==0.28.0
+pydantic==2.6.4
+
+# --- HTTP / entegrasyonlar ---
+requests==2.31.0
+
+# --- Reports (PDF output; falls back to HTML if not installed) ---
+weasyprint==61.2
+
+# --- Distributed queue / cache (SaaS scaling; not needed for the demo) ---
+celery==5.3.6
+redis==5.0.1
+
+# --- Kimlik / yetkilendirme (SaaS) ---
+pyjwt==2.8.0
+
+# --- Configuration ---
+PyYAML==6.0.1
+
+# --- Encryption at rest ---
+cryptography==42.0.5
+
+# --- Optional live intelligence (falls back to passive/simulated mode without keys) ---
+shodan==1.31.0
+
+# --- Test ---
+pytest==8.1.1
+pytest-asyncio==0.23.6

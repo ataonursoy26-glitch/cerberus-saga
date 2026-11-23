@@ -1,0 +1,30 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Cerberus: DEMO (local, no network needed)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/cerberus.py",
+      "args": ["demo"],
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Cerberus: SCAN <target>",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/cerberus.py",
+      "args": ["scan", "scanme.nmap.org"],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Cerberus: API Gateway (uvicorn)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["web_api.main:app", "--reload", "--port", "8000"],
+      "console": "integratedTerminal"
+    }
+  ]
+}

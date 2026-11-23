@@ -1,0 +1,9 @@
+# /.well-known/security.txt  —  thesupermade.com
+# RFC 9116. On Shopify: serve it at /.well-known/security.txt via
+# Online Store > Pages or the theme (with a Shopify app or a redirect).
+Contact: mailto:security@thesupermade.com
+Expires: 2027-12-31T23:59:59Z
+Preferred-Languages: tr, en
+Canonical: https://www.thesupermade.com/.well-known/security.txt
+Policy: https://www.thesupermade.com/policies/privacy-policy
+# If you are a security researcher and found a vulnerability, please write to the address above.

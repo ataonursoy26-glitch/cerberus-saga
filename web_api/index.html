@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en" translate="no" class="notranslate">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="google" content="notranslate">
+<title>Cerberus Saga — Cyber Operations Dashboard</title>
+<style>
+  :root{
+    --bg:#070b10;--bg2:#0b1119;--panel:#0f1620;--panel2:#121b27;
+    --line:rgba(140,170,200,.12);--line2:rgba(140,170,200,.20);
+    --text:#e8eef4;--muted:#8ba0b4;--faint:#5f7488;
+    --accent:#38bdf8;--accent2:#22d3ee;--accentdark:#06283a;
+    --red:#ef4444;--orange:#f97316;--yellow:#eab308;--green:#22c55e;--grey:#64748b;
+    --glow:0 0 0 1px rgba(56,189,248,.15),0 8px 30px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:"Inter",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 80% -10%,rgba(56,189,248,.08),transparent 60%),
+      radial-gradient(900px 500px at -10% 10%,rgba(34,211,238,.06),transparent 55%),var(--bg);
+    color:var(--text);-webkit-font-smoothing:antialiased;letter-spacing:.1px}
+  code{color:#fcd34d;font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em}
+
+  header{position:sticky;top:0;z-index:20;backdrop-filter:blur(10px);
+    background:linear-gradient(180deg,rgba(10,16,24,.92),rgba(10,16,24,.75));
+    border-bottom:1px solid var(--line);padding:16px 26px}
+  .brand{display:flex;align-items:center;gap:14px}
+  .mark{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:20px;
+    background:linear-gradient(135deg,#0ea5e9,#22d3ee);box-shadow:0 6px 20px rgba(14,165,233,.35)}
+  header h1{margin:0;font-size:18px;font-weight:700;letter-spacing:.2px}
+  header h1 span{color:var(--accent)}
+  .sub{margin:2px 0 0;color:var(--muted);font-size:12.5px}
+  .pills{display:flex;gap:7px;margin-left:auto;flex-wrap:wrap}
+  .pill{font-size:10.5px;font-weight:700;letter-spacing:.6px;color:#bfe9ff;
+    padding:5px 10px;border-radius:999px;border:1px solid rgba(56,189,248,.3);background:rgba(56,189,248,.08)}
+
+  nav{display:flex;gap:2px;padding:0 20px;border-bottom:1px solid var(--line);
+    background:rgba(9,14,20,.6);flex-wrap:wrap;position:sticky;top:71px;z-index:19;backdrop-filter:blur(8px)}
+  nav button{background:none;border:none;color:var(--muted);padding:13px 15px;font-size:13.5px;cursor:pointer;
+    border-bottom:2px solid transparent;transition:.15s;font-weight:500}
+  nav button:hover{color:var(--text)}
+  nav button.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:700}
+
+  .wrap{max-width:1120px;margin:0 auto;padding:24px 18px 60px}
+  .tab{display:none;animation:fade .25s ease} .tab.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  .card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);
+    border-radius:16px;padding:20px;margin-bottom:18px;box-shadow:0 10px 34px rgba(0,0,0,.35)}
+  label{display:block;font-size:12px;color:var(--muted);margin-bottom:7px;font-weight:500}
+  select,button.act,input{font-size:14.5px;padding:11px 13px;border-radius:11px;border:1px solid var(--line2);outline:none}
+  select,input{background:#0a1118;color:var(--text);transition:.15s}
+  select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(56,189,248,.14)}
+  input{width:100%}
+  .row{display:flex;gap:12px;align-items:end;flex-wrap:wrap} .row>div{flex:1;min-width:180px}
+  button.act{background:linear-gradient(135deg,#0ea5e9,#22d3ee);color:#042030;font-weight:700;border:none;
+    cursor:pointer;white-space:nowrap;box-shadow:0 6px 18px rgba(14,165,233,.3);transition:.15s}
+  button.act:hover{filter:brightness(1.08);transform:translateY(-1px)}
+  button.act.alt{background:#17222f;color:var(--text);box-shadow:none;border:1px solid var(--line2)}
+  button.act:disabled{opacity:.5;cursor:not-allowed;transform:none}
+  .hint{font-size:12px;color:var(--muted);margin-top:12px;line-height:1.55}
+
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .chip{color:#fff;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.3px}
+  .status{display:none;align-items:center;gap:12px;color:var(--accent);font-weight:600;margin-top:16px}
+  .spinner{width:18px;height:18px;border:2.5px solid rgba(56,189,248,.25);border-top-color:var(--accent);
+    border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  h2{color:var(--text);font-size:13px;letter-spacing:.8px;font-weight:700;
+    padding-bottom:9px;margin:24px 0 12px;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:8px}
+  h2::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+  th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-size:10.5px;letter-spacing:.6px;font-weight:700;
+    background:rgba(255,255,255,.015)}
+  tbody tr:hover,table tr:hover{background:rgba(56,189,248,.04)}
+  .meta{color:var(--muted);font-size:13px}
+
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:10px;font-weight:700;font-size:12.5px}
+  .ok{background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.3)}
+  .bad{background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+  .up{background:var(--green);box-shadow:0 0 8px rgba(34,197,94,.6)}.down{background:#475569}
+  .err{background:rgba(239,68,68,.1);color:#fca5a5;padding:12px 14px;border-radius:11px;display:none;
+    margin-top:14px;border:1px solid rgba(239,68,68,.25)}
+  .empty{color:var(--muted);font-size:13px;padding:10px 0}
+  a.report{color:var(--accent);text-decoration:none;font-weight:600} a.report:hover{text-decoration:underline}
+  .flag{background:var(--red);color:#fff;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700}
+  .sev-CRITICAL{background:var(--red)}.sev-HIGH{background:var(--orange)}
+  .sev-MEDIUM{background:var(--yellow);color:#1a1205}.sev-LOW{background:var(--green)}.sev-INFO{background:var(--grey)}
+  .scrollx{overflow-x:auto}
+  pre{background:#0a1118;border:1px solid var(--line);padding:12px;border-radius:11px;overflow:auto;
+    font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:#cbd5e1}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="mark">🛡️</div>
+    <div>
+      <h1>Cerberus <span>Saga</span> — Cyber Operations Dashboard</h1>
+      <p class="sub">Asynchronous security assessment · scanning · network discovery · live connections · intercept proxy</p>
+    </div>
+    <div class="pills">
+      <span class="pill">AUTHORIZED</span>
+      <span class="pill">LOCAL-ONLY</span>
+      <span class="pill">AUDIT-LOGGED</span>
+    </div>
+  </div>
+</header>
+<nav id="nav">
+  <button data-tab="scan" class="active">🔍 Scan</button>
+  <button data-tab="net">🌐 Network Interfaces</button>
+  <button data-tab="conn">📡 Live Connections</button>
+  <button data-tab="pcap">🧪 Packet Monitor</button>
+  <button data-tab="proxy">🕵️ Proxy (Burp-lite)</button>
+  <button data-tab="store">🛒 Store Audit</button>
+  <button data-tab="assess">⚔️ Assessment</button>
+  <button data-tab="jwt">🔑 JWT</button>
+</nav>
+<div class="wrap">
+
+  <!-- ================= SCAN ================= -->
+  <div class="tab active" id="tab-scan">
+    <div class="card">
+      <div class="row">
+        <div>
+          <label for="target">Target (authorized targets only)</label>
+          <select id="target"></select>
+        </div>
+        <div style="flex:0"><label>&nbsp;</label><button class="act" id="run">🔍 Start Scan</button></div>
+      </div>
+      <label style="margin-top:14px;display:flex;align-items:center;gap:8px;cursor:pointer">
+        <input type="checkbox" id="demo" style="width:auto"> Inject demo data (shows DLP capability)</label>
+      <div class="hint">⏱️ ~15–30s: nmap + content fetch + vulnerabilities + DLP + IAM</div>
+      <div class="status" id="status"><div class="spinner"></div><span id="statusText">Scanning…</span></div>
+      <div class="err" id="err"></div>
+    </div>
+    <div class="card" id="results" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+        <div><div class="meta">Target: <code id="rTarget"></code> · Elapsed: <span id="rTime"></span> s</div>
+          <div class="chips" id="rChips"></div></div>
+        <div><span class="badge" id="rAudit"></span></div>
+      </div>
+      <div id="rBody"></div>
+      <p style="margin-top:16px"><a class="report" id="rReport" target="_blank">📄 Open full HTML report</a></p>
+    </div>
+  </div>
+
+  <!-- ================= NETWORK ================= -->
+  <div class="tab" id="tab-net">
+    <div class="card">
+      <button class="act alt" onclick="loadNet()">🔄 Refresh</button>
+      <span class="meta" id="gw" style="margin-left:12px"></span>
+      <div id="netBody"><div class="empty">Loading…</div></div>
+    </div>
+  </div>
+
+  <!-- ================= CONNECTIONS ================= -->
+  <div class="tab" id="tab-conn">
+    <div class="card">
+      <button class="act alt" onclick="loadConn()">🔄 Refresh</button>
+      <label style="display:inline-flex;align-items:center;gap:6px;margin-left:12px">
+        <input type="checkbox" id="autoConn" style="width:auto"> Auto-refresh (3s)</label>
+      <span class="meta" id="connCount" style="margin-left:12px"></span>
+      <div class="scrollx" id="connBody"><div class="empty">Loading…</div></div>
+    </div>
+  </div>
+
+  <!-- ================= PACKET MONITOR ================= -->
+  <div class="tab" id="tab-pcap">
+    <div class="card">
+      <div class="row">
+        <div><label>Interface</label><select id="pcapIface"></select></div>
+        <div style="flex:0"><label>Packets</label><input id="pcapCount" type="number" value="20" min="1" max="500" style="width:90px"></div>
+        <div><label>Filter (BPF, optional)</label><input id="pcapFilter" placeholder="e.g.: tcp port 443"></div>
+        <div style="flex:0"><label>&nbsp;</label><button class="act" id="pcapRun">🧪 Capture</button></div>
+      </div>
+      <div class="hint">Passive capture (your own traffic). Summaries are stored, not packet contents. On macOS/Linux this usually needs <code>sudo</code>: <code>sudo python3 cerberus.py serve</code></div>
+      <div class="status" id="pcapStatus"><div class="spinner"></div><span>Capturing…</span></div>
+      <div class="err" id="pcapErr"></div>
+      <div class="scrollx" id="pcapBody"></div>
+    </div>
+  </div>
+
+  <!-- ================= STORE AUDIT ================= -->
+  <div class="tab" id="tab-store">
+    <div class="card">
+      <div class="row">
+        <div><label>Store URL (in scope)</label>
+          <input id="storeTarget" value="https://www.thesupermade.com"></div>
+        <div style="flex:0"><label>&nbsp;</label><button class="act" id="storeRun">🛒 Audit</button></div>
+      </div>
+      <div class="hint">Checks TLS/HTTPS, security headers (HSTS/CSP/clickjacking), cookie flags, trust pages (privacy/returns/terms/contact) and security.txt. Non-destructive, read-only.</div>
+      <div class="status" id="storeStatus"><div class="spinner"></div><span>Auditing…</span></div>
+      <div class="err" id="storeErr"></div>
+      <div id="storeBody"></div>
+    </div>
+  </div>
+
+  <!-- ================= ASSESSMENT ================= -->
+  <div class="tab" id="tab-assess">
+    <div class="card">
+      <div class="row">
+        <div><label>Target (authorized — your own site)</label>
+          <input id="assTarget" value="https://www.thesupermade.com"></div>
+        <div style="flex:0"><label>&nbsp;</label><button class="act" id="assRun">⚔️ Full Assessment</button></div>
+      </div>
+      <div class="hint">One pass: technology fingerprint + CVE hints + TLS + email security + store/trust + active web recon. Non-destructive, read-only. ~20–40s.</div>
+      <div class="status" id="assStatus"><div class="spinner"></div><span>Assessing…</span></div>
+      <div class="err" id="assErr"></div>
+      <div id="assBody"></div>
+    </div>
+  </div>
+
+  <!-- ================= JWT ================= -->
+  <div class="tab" id="tab-jwt">
+    <div class="card">
+      <label>JWT token (paste)</label>
+      <input id="jwtInput" placeholder="eyJhbGciOi...">
+      <div style="margin-top:10px"><button class="act" id="jwtRun">🔑 Analyze</button></div>
+      <div class="hint">Checks alg=none bypass, weak HS256 secret (crack attempt), missing exp, and authorization claims. Offline; the token is never sent externally.</div>
+      <div class="err" id="jwtErr"></div>
+      <div id="jwtBody"></div>
+    </div>
+  </div>
+
+  <!-- ================= PROXY ================= -->
+  <div class="tab" id="tab-proxy">
+    <div class="card">
+      <div class="row">
+        <div style="flex:0"><label>Port</label><input id="proxyPort" type="number" value="8081" style="width:110px"></div>
+        <div style="flex:0"><label>&nbsp;</label><button class="act" id="proxyStart">▶️ Start</button></div>
+        <div style="flex:0"><label>&nbsp;</label><button class="act alt" id="proxyStop">⏹️ Stop</button></div>
+        <div style="flex:0"><label>&nbsp;</label><button class="act alt" onclick="loadTx()">🔄 Refresh</button></div>
+        <div style="flex:0"><label>&nbsp;</label><button class="act alt" onclick="clearTx()">🗑️ Clear</button></div>
+        <div><label>&nbsp;</label><span class="badge" id="proxyState">—</span></div>
+      </div>
+      <div class="hint">Set your browser proxy to <code id="proxyAddr">127.0.0.1:8081</code> and browse; requests appear below. HTTPS is only tunneled (not decrypted). DLP scanning runs on HTTP bodies that pass through.</div>
+      <label style="display:inline-flex;align-items:center;gap:6px;margin-top:10px">
+        <input type="checkbox" id="autoTx" style="width:auto"> Auto-refresh (3s)</label>
+      <div class="scrollx" id="proxyBody"><div class="empty">No activity yet.</div></div>
+    </div>
+  </div>
+
+</div>
+<script>
+const $=(id)=>document.getElementById(id);
+function esc(s){return String(s==null?'':s).replace(/</g,'&lt;')}
+function chip(s,n){return `<span class="chip sev-${s}">${s}: ${n}</span>`}
+function tbl(cols,rows){
+  if(!rows||!rows.length) return '<div class="empty">No records.</div>';
+  const h=cols.map(c=>`<th>${c.label}</th>`).join('');
+  const b=rows.map(r=>'<tr>'+cols.map(c=>{
+    let v=r[c.key]; if(Array.isArray(v)) v=v.join(', ');
+    if(c.key==='severity'&&v) return `<td><span class="chip sev-${v}">${v}</span></td>`;
+    if(c.render) return `<td>${c.render(r)}</td>`;
+    return `<td>${esc(v)}</td>`;}).join('')+'</tr>').join('');
+  return `<table><tr>${h}</tr>${b}</table>`;
+}
+
+/* ---- tabs ---- */
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#nav button').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); $('tab-'+b.dataset.tab).classList.add('active');
+  if(b.dataset.tab==='net') loadNet();
+  if(b.dataset.tab==='conn') loadConn();
+  if(b.dataset.tab==='pcap') loadIfaceOptions();
+  if(b.dataset.tab==='proxy'){loadProxyStatus();loadTx();}
+});
+
+/* ---- SCAN ---- */
+async function loadScope(){try{const d=await(await fetch('/api/scope')).json();
+  $('target').innerHTML=(d.scope||[]).map(s=>`<option>${s}</option>`).join('');}catch(e){}}
+function countSev(res){const c={CRITICAL:0,HIGH:0,MEDIUM:0,LOW:0,INFO:0};
+  [...(res.dlp_findings||[]),...(res.vulnerabilities||[]),...(res.cti||[]),...(res.sbom||[]),...(res.ai_injection||[])]
+  .forEach(x=>{const s=(x.severity||x.priority||'INFO').toString().toUpperCase();if(c[s]!==undefined)c[s]++});return c;}
+function renderScan(res,report){
+  $('rTarget').textContent=(res.meta&&res.meta.target)||''; $('rTime').textContent=(res.meta&&res.meta.elapsed_seconds)||'-';
+  const c=countSev(res); $('rChips').innerHTML=['CRITICAL','HIGH','MEDIUM','LOW','INFO'].map(s=>chip(s,c[s])).join('');
+  const ok=res.meta&&res.meta.audit_chain_valid; const b=$('rAudit');
+  b.textContent=ok?'✅ Audit chain verified':'❌ Audit chain broken'; b.className='badge '+(ok?'ok':'bad');
+  let h='';
+  h+='<h2>Open Ports</h2>'+tbl([{key:'port',label:'Port'},{key:'service',label:'Service'},{key:'version',label:'Version'}],(res.network&&res.network.ports)||[]);
+  h+='<h2>Vulnerabilities</h2>'+tbl([{key:'severity',label:'Severity'},{key:'name',label:'Vulnerability'},{key:'template',label:'CVE/Template'},{key:'detail',label:'Description'}],res.vulnerabilities||[]);
+  h+='<h2>Sensitive Data (DLP · masked)</h2>'+tbl([{key:'severity',label:'Severity'},{key:'category',label:'Type'},{key:'match_masked',label:'Masked'}],res.dlp_findings||[]);
+  h+='<h2>CTI — Ransomware</h2>'+tbl([{key:'cve',label:'CVE'},{key:'linked_ransomware_groups',label:'Groups'},{key:'priority',label:'Priority'}],res.cti||[]);
+  const iam=res.iam||{},rows=[];['authentication','authorization'].forEach(k=>{const r=iam[k];if(r&&r.findings)r.findings.forEach(f=>rows.push({severity:f.severity,check:f.check||f.finding_type,detail:f.detail}))});
+  h+='<h2>IAM Audit</h2>'+tbl([{key:'severity',label:'Severity'},{key:'check',label:'Check'},{key:'detail',label:'Result'}],rows);
+  $('rBody').innerHTML=h;
+  if(report){$('rReport').href='/reports/'+report;$('rReport').style.display=''}else{$('rReport').style.display='none'}
+  $('results').style.display='block';
+}
+$('run').onclick=async()=>{
+  $('err').style.display='none';$('results').style.display='none';$('status').style.display='flex';$('run').disabled=true;
+  try{const r=await fetch('/api/scan',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({target:$('target').value,demo:$('demo').checked})});
+    const d=await r.json(); if(!r.ok||d.error) throw new Error(d.error||('HTTP '+r.status)); renderScan(d.results,d.report);
+  }catch(e){$('err').textContent='⚠️ '+e.message;$('err').style.display='block';}
+  finally{$('status').style.display='none';$('run').disabled=false;}
+};
+
+/* ---- NETWORK ---- */
+async function loadNet(){
+  try{const d=await(await fetch('/api/interfaces')).json();
+    $('gw').textContent='Gateway: '+(d.gateway.gateway||'?')+' ('+(d.gateway.interface||'?')+')';
+    let h='<h2>Network Interfaces</h2>'+tbl([
+      {key:'status',label:'Status',render:r=>`<span class="dot ${r.status==='up'?'up':'down'}"></span>${esc(r.status)}`},
+      {key:'name',label:'Interface'},{key:'ipv4',label:'IPv4'},{key:'mac',label:'MAC'}],d.interfaces||[]);
+    h+='<h2>Neighbor Devices (passive — ARP table)</h2>'+tbl([{key:'ip',label:'IP'},{key:'mac',label:'MAC'}],d.neighbors||[]);
+    $('netBody').innerHTML=h;
+  }catch(e){$('netBody').innerHTML='<div class="err" style="display:block">⚠️ '+e.message+'</div>';}
+}
+
+/* ---- CONNECTIONS ---- */
+let connTimer=null;
+async function loadConn(){
+  try{const d=await(await fetch('/api/connections')).json();
+    $('connCount').textContent=d.count+' connections';
+    $('connBody').innerHTML=tbl([{key:'proto',label:'Proto'},{key:'process',label:'Process'},
+      {key:'local',label:'Local'},{key:'remote',label:'Remote'},{key:'service',label:'Service'},{key:'state',label:'State'}],d.connections||[]);
+  }catch(e){$('connBody').innerHTML='<div class="err" style="display:block">⚠️ '+e.message+'</div>';}
+}
+$('autoConn').onchange=e=>{clearInterval(connTimer);if(e.target.checked)connTimer=setInterval(loadConn,3000)};
+
+/* ---- PACKET MONITOR ---- */
+async function loadIfaceOptions(){
+  try{const d=await(await fetch('/api/interfaces')).json();
+    const up=(d.interfaces||[]).filter(i=>!i.is_loopback);
+    $('pcapIface').innerHTML=(up.length?up:d.interfaces||[]).map(i=>`<option>${i.name}</option>`).join('');
+  }catch(e){}
+}
+$('pcapRun').onclick=async()=>{
+  $('pcapErr').style.display='none';$('pcapStatus').style.display='flex';$('pcapRun').disabled=true;$('pcapBody').innerHTML='';
+  try{const r=await fetch('/api/capture',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({interface:$('pcapIface').value,count:+$('pcapCount').value,filter:$('pcapFilter').value})});
+    const d=await r.json();
+    if(d.engine==='unavailable'||d.engine==='denied'||d.engine==='error'){
+      $('pcapErr').textContent='⚠️ '+d.note;$('pcapErr').style.display='block';}
+    $('pcapBody').innerHTML='<div class="meta" style="margin:8px 0">'+esc(d.note||'')+'</div>'+
+      tbl([{key:'time',label:'Time'},{key:'proto',label:'Proto'},{key:'src',label:'Source'},
+        {key:'dst',label:'Target'},{key:'length',label:'Size'},{key:'raw',label:'Raw'}],d.packets||[]);
+  }catch(e){$('pcapErr').textContent='⚠️ '+e.message;$('pcapErr').style.display='block';}
+  finally{$('pcapStatus').style.display='none';$('pcapRun').disabled=false;}
+};
+
+/* ---- PROXY ---- */
+let txTimer=null;
+async function loadProxyStatus(){
+  try{const d=await(await fetch('/api/proxy/status')).json();
+    const b=$('proxyState');
+    if(d.running){b.textContent='● Running :'+d.port;b.className='badge ok';$('proxyAddr').textContent='127.0.0.1:'+d.port;}
+    else{b.textContent='○ Stopped';b.className='badge bad';}
+  }catch(e){}
+}
+$('proxyStart').onclick=async()=>{
+  const d=await(await fetch('/api/proxy/start',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({port:+$('proxyPort').value})})).json();
+  loadProxyStatus();
+};
+$('proxyStop').onclick=async()=>{await fetch('/api/proxy/stop',{method:'POST'});loadProxyStatus();};
+async function loadTx(){
+  try{const d=await(await fetch('/api/proxy/tx')).json();
+    $('proxyBody').innerHTML=tbl([{key:'time',label:'Time'},{key:'method',label:'Method'},
+      {key:'host',label:'Host'},{key:'path',label:'Path'},{key:'status',label:'Status'},
+      {key:'dlp',label:'DLP',render:r=>(r.dlp&&r.dlp.length)?`<span class="flag">${r.dlp.join(', ')}</span>`:'<span class="meta">clean</span>'}],
+      d.transactions||[]);
+  }catch(e){}
+}
+function clearTx(){fetch('/api/proxy/clear',{method:'POST'}).then(loadTx);}
+$('autoTx').onchange=e=>{clearInterval(txTimer);if(e.target.checked)txTimer=setInterval(loadTx,3000)};
+
+/* ---- STORE AUDIT ---- */
+$('storeRun').onclick=async()=>{
+  $('storeErr').style.display='none';$('storeStatus').style.display='flex';$('storeRun').disabled=true;$('storeBody').innerHTML='';
+  try{
+    const r=await fetch('/api/storefront',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({target:$('storeTarget').value})});
+    const d=await r.json(); if(!r.ok||d.error) throw new Error(d.error||('HTTP '+r.status));
+    let h='';
+    if(d.tls){const t=d.tls;
+      h+='<h2>TLS / Certificate</h2><table>'+
+        `<tr><td>Protocol</td><td>${esc(t.tls_version||'?')}</td></tr>`+
+        `<tr><td>Issuer</td><td>${esc(t.issuer||'?')}</td></tr>`+
+        `<tr><td>Expires</td><td>${esc(t.expires||'?')} (${esc(t.days_left)} days)</td></tr></table>`;}
+    if(d.email){const e=d.email;
+      h+='<h2>Email Security (anti-phishing)</h2><table>'+
+        `<tr><td>SPF</td><td>${e.spf?'✅ present':'❌ MISSING'}</td></tr>`+
+        `<tr><td>DMARC</td><td>${e.dmarc?('✅ '+esc(e.dmarc.match(/p=\w+/)?e.dmarc.match(/p=\w+/)[0]:'present')):'❌ MISSING'}</td></tr></table>`;}
+    h+='<h2>Findings ('+d.findings.length+')</h2>'+tbl(
+      [{key:'severity',label:'Severity'},{key:'area',label:'Area'},{key:'detail',label:'Description'}],d.findings);
+    const tp=d.trust_pages||{};
+    h+='<h2>Trust Pages</h2><table>'+Object.keys(tp).map(k=>
+      `<tr><td>${(tp[k]?'✅':'❌')}</td><td>${esc(k)}</td></tr>`).join('')+'</table>';
+    $('storeBody').innerHTML=h;
+  }catch(e){$('storeErr').textContent='⚠️ '+e.message;$('storeErr').style.display='block';}
+  finally{$('storeStatus').style.display='none';$('storeRun').disabled=false;}
+};
+
+/* ---- ASSESSMENT ---- */
+$('assRun').onclick=async()=>{
+  $('assErr').style.display='none';$('assStatus').style.display='flex';$('assRun').disabled=true;$('assBody').innerHTML='';
+  try{
+    const r=await fetch('/api/assess',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({target:$('assTarget').value})});
+    const d=await r.json(); if(!r.ok||d.error) throw new Error(d.error||('HTTP '+r.status));
+    if(d.inconclusive){$('assBody').innerHTML='<div class="empty">⏸️ '+esc(d.note)+'</div>';return;}
+    const gc={'A+':'#22c55e','A':'#22c55e','B':'#a3e635','C':'#eab308','D':'#f97316','F':'#ef4444'}[d.grade]||'#64748b';
+    let h=`<div style="display:flex;align-items:center;gap:18px;margin:4px 0 12px">
+      <div style="width:84px;height:84px;border-radius:20px;display:grid;place-items:center;font-size:40px;font-weight:800;color:#06131f;background:${gc};box-shadow:0 8px 24px ${gc}55">${esc(d.grade||'?')}</div>
+      <div><div style="font-size:22px;font-weight:800">${esc(d.score)}/100</div><div class="meta">security grade</div></div></div>`;
+    h+='<h2>Technology Fingerprint</h2><table>'+Object.keys(d.stack||{}).map(k=>
+      `<tr><td>${esc(k)}</td><td>${esc(d.stack[k])}</td></tr>`).join('')+'</table>';
+    (d.sections||[]).forEach(s=>{
+      h+=`<h2>${esc(s.title)} (${s.findings.length})</h2>`+tbl(
+        [{key:'severity',label:'Severity'},{key:'area',label:'Area'},{key:'detail',label:'Description'}],s.findings);
+    });
+    if(d.report) h+=`<p style="margin-top:14px"><a class="report" href="/reports/${esc(d.report)}" target="_blank">📄 Open full report</a></p>`;
+    h+='<h2>Security Grade History</h2><div id="histBox" class="meta">loading…</div>';
+    $('assBody').innerHTML=h;
+    try{
+      const hd=await(await fetch('/api/history?target='+encodeURIComponent($('assTarget').value))).json();
+      const hist=hd.history||[];
+      if(hist.length<=1){$('histBox').textContent='At least 2 assessments are required to compare (run again).';}
+      else{
+        const bars=hist.slice(-20).map(s=>{
+          const col={'A+':'#22c55e','A':'#22c55e','B':'#a3e635','C':'#eab308','D':'#f97316','F':'#ef4444'}[s.grade]||'#64748b';
+          return `<div title="${esc(s.ts)}: ${s.grade} (${s.score})" style="flex:0 0 22px;height:${Math.max(4,s.score)}px;background:${col};border-radius:4px 4px 0 0"></div>`;
+        }).join('');
+        $('histBox').innerHTML=`<div style="display:flex;align-items:flex-end;gap:4px;height:110px;padding:8px 0;border-bottom:1px solid var(--line)">${bars}</div>`
+          +`<div class="meta" style="margin-top:6px">Last ${Math.min(hist.length,20)} assessments · newest on the right</div>`;
+      }
+    }catch(e){$('histBox').textContent='failed to load history';}
+  }catch(e){$('assErr').textContent='⚠️ '+e.message;$('assErr').style.display='block';}
+  finally{$('assStatus').style.display='none';$('assRun').disabled=false;}
+};
+
+/* ---- JWT ---- */
+$('jwtRun').onclick=async()=>{
+  $('jwtErr').style.display='none';$('jwtBody').innerHTML='';
+  try{
+    const r=await fetch('/api/jwt',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({token:$('jwtInput').value})});
+    const d=await r.json(); if(!r.ok||d.error) throw new Error(d.error||('HTTP '+r.status));
+    let h=`<h2>Header</h2><pre>${esc(JSON.stringify(d.header))}</pre>`;
+    h+=`<h2>Payload</h2><pre>${esc(JSON.stringify(d.payload))}</pre>`;
+    if(d.cracked_secret) h+=`<p style="color:#fca5a5;font-weight:700">🔓 CRACKED SECRET: ${esc(d.cracked_secret)}</p>`;
+    h+='<h2>Findings</h2>'+tbl([{key:'severity',label:'Severity'},{key:'check',label:'Check'},{key:'detail',label:'Description'}],d.findings);
+    $('jwtBody').innerHTML=h;
+  }catch(e){$('jwtErr').textContent='⚠️ '+e.message;$('jwtErr').style.display='block';}
+};
+
+loadScope();
+</script>
+</body>
+</html>

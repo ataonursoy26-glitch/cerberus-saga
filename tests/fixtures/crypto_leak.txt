@@ -1,0 +1,14 @@
+# FAKE TEST DATA — not real, only for exercising Cerberus.
+# (None of it belongs to a real account or wallet.)
+
+binance_api_key = OhbVrpoiVgRV5IfLBcbfnoGMbJmTPSIAoCLrZ3aWZkSBvrjn9Wvgfygw2wMqZcUD
+binance_api_secret: Ih7yfJs1ON43xKmTecQoXsf2o3gyrDO1xkxwnQrS7RPeMOkIUpkDyr7OSJoRu1XX
+
+# wallet private key (fake)
+wallet private key: 0x4c0883a69102937d6231471b5dbb6204fe512961708279b4f58a9c0e3b0e4c11
+
+# seed / mnemonic (fake, BIP-39 style)
+recovery phrase: abandon ability able about above absent absorb abstract access account achieve across
+
+# unrelated high-entropy value (must not be a false positive — no context)
+asset_hash = 8cd477aa13d1c5e3f9a2b4c6d8e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8

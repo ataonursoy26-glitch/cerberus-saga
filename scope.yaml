@@ -1,0 +1,31 @@
+# ============================================================================
+# CERBERUS SAGA - AUTHORIZATION SCOPE
+# ============================================================================
+# This file defines the targets the tool is ALLOWED to scan.
+# Per Blueprint Volume 7 (item a) and Volume 8: no module runs against a
+# target outside this list. Out-of-scope target -> PermissionError.
+#
+# By default only local/isolated targets are enabled for the demo.
+# In a real pentest, ONLY domains/IPs covered by a signed authorization
+# agreement (scope of work) may be added here.
+# ============================================================================
+
+authorized_scope:
+  - "localhost"
+  - "127.0.0.1"
+  - "::1"
+  - "testphp.vulnweb.com"   # Acunetix's public, intentionally vulnerable test target
+  - "scanme.nmap.org"        # Nmap's official target that permits scanning
+  - "192.168.1.1"            # the author's OWN home router (authorized)
+  - "192.168.1.223"          # the author's OWN machine
+  - "thesupermade.com"       # the author's OWN e-commerce site (authorized)
+  - "www.thesupermade.com"
+
+# Signed authorization record: verified before every scan.
+authorization:
+  engagement_id: "DEMO-2026-SCHOOL-PROJECT"
+  authorized_by: "Ata Deniz Onursoy"
+  valid_until: "2026-12-31"
+  notes: >
+    Learning-project demo. Runs only against the targets listed above,
+    which explicitly permit scanning.

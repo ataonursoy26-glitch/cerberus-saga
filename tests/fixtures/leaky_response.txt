@@ -1,0 +1,23 @@
+HTTP/1.1 200 OK
+Server: Apache/2.4.49 (Unix) OpenSSL/1.0.1
+X-Powered-By: nginx/1.18.0
+X-SSH-Banner: OpenSSH 7.6
+Content-Type: application/json
+
+{
+  "support_email": "destek@orneksirket.com.tr",
+  "phone": "+90 532 111 22 33",
+  "customer_tc": "10000000146",
+  "iban": "TR33 0006 1005 1978 6457 8413 26",
+  "card_on_file": "4242 4242 4242 4242",
+  "us_ssn": "219-09-9999",
+  "aws_key": "AKIAIOSFODNN7EXAMPLE",
+  "stripe": "sk_live_51H8xXxXxXxXxXxXxXxXxXxXx",
+  "github_pat": "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",
+  "db_url": "postgres://admin:SuperSecretPass99@db.internal:5432/prod",
+  "note": "This is NOT a placeholder; production dump.",
+  "example_block": "example dummy key AKIAZZZZZZZZZZZZZZZZ should be suppressed to INFO",
+  "swift": "DEUTDEFF500",
+  "eth_wallet": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+  "account_note": "account number 1234567890123 belongs to vendor"
+}
