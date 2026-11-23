@@ -288,8 +288,8 @@ def test_js_secret_scan_finds_embedded_key(monkeypatch):
     monkeypatch.setattr(js, "request", fake)
     rep = js.JSSecretScanner("https://127.0.0.1/").run()
     cats = {f.category for f in rep.findings}
-    assert "STRIPE_SECRET_KEY" in cats   # ana sayfadan
-    assert "AWS_ACCESS_KEY" in cats       # app.js'ten
+    assert "STRIPE_SECRET_KEY" in cats   # from the home page
+    assert "AWS_ACCESS_KEY" in cats       # from app.js
     assert rep.scripts_scanned == 1
 
 
